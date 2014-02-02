@@ -6,62 +6,71 @@ import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.media.AudioFormat;
 import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.provider.ContactsContract.PhoneLookup;
 import android.telephony.TelephonyManager;
 
 public class MorseRinger extends BroadcastReceiver {
-	private final int sampleRate = 8000;
-	private final double freqOfTone = 440;
+	private int sampleRate = 8000;
+	private double freqOfTone = 440;
 
 	private Context c = null;
 
-	// Think of "DIT" as "DIT_DURATION" --- to save screen space and read/write effort
-	private int DIT = 80;
-	private int DAH = 280; //3*DIT;
+	private int DIT;     // DIT_DURATION
+	private int DAH;     // DAH_DURATION
+	private int DD_GAP;  // DIT_DAH_GAP
+	private int L_GAP;   // LETTER_GAP
+	private int W_GAP;   // WORD_GAP
 
-	private int DD_GAP =      80;  // DIT_DAH_GAP, 1*DIT
-	private int  L_GAP =     310;  // LETTER_GAP, 3*DIT
-	private int  W_GAP = 7 * DIT;  // WORD_GAP
-
-	private int[][] morseDurations = {
-		{DIT, DD_GAP, DAH},                                 // ._
-		{DAH, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DIT},       // _...
-		{DAH, DD_GAP, DIT, DD_GAP, DAH, DD_GAP, DIT},       // _._.
-		{DAH, DD_GAP, DIT, DD_GAP, DIT},                    // _..
-		{DIT},                                              // .
-		{DIT, DD_GAP, DIT, DD_GAP, DAH, DD_GAP, DIT},       // .._.
-		{DAH, DD_GAP, DAH, DD_GAP, DIT},                    // __.
-		{DIT, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DIT},       // ....
-		{DIT, DD_GAP, DIT},                                 // ..
-		{DIT, DD_GAP, DAH, DD_GAP, DAH, DD_GAP, DAH},       // .___
-		{DAH, DD_GAP, DIT, DD_GAP, DAH},                    // _._
-		{DIT, DD_GAP, DAH, DD_GAP, DIT, DD_GAP, DIT},       // ._..
-		{DAH, DD_GAP, DAH},                                 // __
-		{DAH, DD_GAP, DIT},                                 // _.
-		{DAH, DD_GAP, DAH, DD_GAP, DAH},                    // ___
-		{DIT, DD_GAP, DAH, DD_GAP, DAH, DD_GAP, DIT},       // .__.
-		{DAH, DD_GAP, DAH, DD_GAP, DIT, DD_GAP, DAH},       // __._
-		{DIT, DD_GAP, DAH, DD_GAP, DIT},                    // ._.
-		{DIT, DD_GAP, DIT, DD_GAP, DIT},                    // ...
-		{DAH},                                              // _
-		{DIT, DD_GAP, DIT, DD_GAP, DAH},                    // .._
-		{DIT, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DAH},       // ..._
-		{DIT, DD_GAP, DAH, DD_GAP, DAH},                    // .__
-		{DAH, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DAH},       // _.._
-		{DAH, DD_GAP, DIT, DD_GAP, DAH, DD_GAP, DAH},       // _.__
-		{DAH, DD_GAP, DAH, DD_GAP, DIT, DD_GAP, DIT},       // __..
-	};
+	private int[][] morseDurations;
 
 	@Override
 	public void onReceive(Context c, Intent i) {
 		this.c = c;
 		String phoneState = i.getStringExtra(TelephonyManager.EXTRA_STATE);
 		String contactName = null;
+
+		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(c);
+		String packageName = c.getPackageName();
+		DIT = pref.getInt(packageName + ".DIT", 80);
+		DAH = pref.getInt(packageName + ".DAH", 280);
+		DD_GAP = pref.getInt(packageName + ".DD_GAP", 80);
+		L_GAP = pref.getInt(packageName + ".L_GAP", 310);
+		W_GAP = pref.getInt(packageName + ".W_GAP", 710);
+		morseDurations = new int[][] {
+			{DIT, DD_GAP, DAH},                                 // ._
+			{DAH, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DIT},       // _...
+			{DAH, DD_GAP, DIT, DD_GAP, DAH, DD_GAP, DIT},       // _._.
+			{DAH, DD_GAP, DIT, DD_GAP, DIT},                    // _..
+			{DIT},                                              // .
+			{DIT, DD_GAP, DIT, DD_GAP, DAH, DD_GAP, DIT},       // .._.
+			{DAH, DD_GAP, DAH, DD_GAP, DIT},                    // __.
+			{DIT, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DIT},       // ....
+			{DIT, DD_GAP, DIT},                                 // ..
+			{DIT, DD_GAP, DAH, DD_GAP, DAH, DD_GAP, DAH},       // .___
+			{DAH, DD_GAP, DIT, DD_GAP, DAH},                    // _._
+			{DIT, DD_GAP, DAH, DD_GAP, DIT, DD_GAP, DIT},       // ._..
+			{DAH, DD_GAP, DAH},                                 // __
+			{DAH, DD_GAP, DIT},                                 // _.
+			{DAH, DD_GAP, DAH, DD_GAP, DAH},                    // ___
+			{DIT, DD_GAP, DAH, DD_GAP, DAH, DD_GAP, DIT},       // .__.
+			{DAH, DD_GAP, DAH, DD_GAP, DIT, DD_GAP, DAH},       // __._
+			{DIT, DD_GAP, DAH, DD_GAP, DIT},                    // ._.
+			{DIT, DD_GAP, DIT, DD_GAP, DIT},                    // ...
+			{DAH},                                              // _
+			{DIT, DD_GAP, DIT, DD_GAP, DAH},                    // .._
+			{DIT, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DAH},       // ..._
+			{DIT, DD_GAP, DAH, DD_GAP, DAH},                    // .__
+			{DAH, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DAH},       // _.._
+			{DAH, DD_GAP, DIT, DD_GAP, DAH, DD_GAP, DAH},       // _.__
+			{DAH, DD_GAP, DAH, DD_GAP, DIT, DD_GAP, DIT},       // __..
+		};
 
 		if (TelephonyManager.EXTRA_STATE_RINGING.equals(phoneState)) {
 			String incomingNumber = i.getStringExtra(TelephonyManager.EXTRA_INCOMING_NUMBER);
@@ -148,12 +157,13 @@ public class MorseRinger extends BroadcastReceiver {
 	private int copyArrayToArrayAt(int[] src, int[] dest, int startingIndex) {
 		int sLength = src.length;
 		int dLength = dest.length;
-		for (int i = 0; i < sLength; i++) {
+		int i;
+		for (i = 0; i < sLength; i++) {
 			if (startingIndex + i >= dLength)
 				break;
 
 			dest[startingIndex + i] = src[i];
 		}
-		return startingIndex + sLength;
+		return startingIndex + i;
 	}
 }
