@@ -5,14 +5,13 @@
 	android:layout_height="match_parent">
 
 	<EditText
-		android:id="@+id/phoneNumberTF"
+		android:id="@+id/incomingNumberTF"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:hint="@string/tf_hint_1"
 		android:inputType="phone" />
 	<Button
 		android:text="@string/btn_label_1"
-		android:id="@+id/testFakeCallBtn"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
 		android:onClick="testFakeCall" />
@@ -23,34 +22,9 @@
 		android:layout_height="wrap_content"
 		android:hint="@string/tf_hint_2"
 		android:inputType="number" />
-	<EditText
-		android:id="@+id/dahTF"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:hint="@string/tf_hint_3"
-		android:inputType="number" />
-	<EditText
-		android:id="@+id/ddgapTF"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:hint="@string/tf_hint_4"
-		android:inputType="number" />
-	<EditText
-		android:id="@+id/lgapTF"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:hint="@string/tf_hint_5"
-		android:inputType="number" />
-	<EditText
-		android:id="@+id/wgapTF"
-		android:layout_width="fill_parent"
-		android:layout_height="wrap_content"
-		android:hint="@string/tf_hint_6"
-		android:inputType="number" />
 	<Button
 		android:text="@string/btn_label_2"
-		android:id="@+id/savePreferencesBtn"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:onClick="savePreferences" />
+		android:onClick="saveSettings" />
 </LinearLayout>

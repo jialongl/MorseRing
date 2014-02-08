@@ -18,9 +18,6 @@ import android.telephony.TelephonyManager;
 
 public class MorseRinger extends BroadcastReceiver {
 	private int sampleRate = 8000;
-	private double freqOfTone = 440;
-
-	private Context c = null;
 
 	private int DIT;     // DIT_DURATION
 	private int DAH;     // DAH_DURATION
@@ -28,6 +25,7 @@ public class MorseRinger extends BroadcastReceiver {
 	private int L_GAP;   // LETTER_GAP
 	private int W_GAP;   // WORD_GAP
 
+	private Context c = null;
 	private int[][] morseDurations;
 
 	@Override
@@ -38,11 +36,12 @@ public class MorseRinger extends BroadcastReceiver {
 
 		SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(c);
 		String packageName = c.getPackageName();
-		DIT = pref.getInt(packageName + ".DIT", 80);
-		DAH = pref.getInt(packageName + ".DAH", 280);
-		DD_GAP = pref.getInt(packageName + ".DD_GAP", 80);
-		L_GAP = pref.getInt(packageName + ".L_GAP", 310);
-		W_GAP = pref.getInt(packageName + ".W_GAP", 710);
+		DIT = pref.getInt(packageName + ".DIT", Defaults.DIT);
+		DAH = 3 * DIT;
+		DD_GAP = DIT;
+		L_GAP = 3 * DIT;
+		W_GAP = 7 * DIT;
+
 		morseDurations = new int[][] {
 			{DIT, DD_GAP, DAH},                                 // ._
 			{DAH, DD_GAP, DIT, DD_GAP, DIT, DD_GAP, DIT},       // _...
@@ -129,7 +128,7 @@ public class MorseRinger extends BroadcastReceiver {
 		for (int i = 0; i < dIndex; i++) {
 			nextSampleIndex = sampleIndex + sampleRate * durations[i] / 1000;
 			for (; sampleIndex < nextSampleIndex; sampleIndex++)
-				sample[sampleIndex] = Math.sin(2 * Math.PI * sampleIndex / (sampleRate/freqOfTone));
+				sample[sampleIndex] = Math.sin(2 * Math.PI * sampleIndex / (sampleRate / Defaults.toneFreq));
 
 			i++;
 			nextSampleIndex = sampleIndex + sampleRate * durations[i] / 1000;

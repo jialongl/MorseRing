@@ -1,11 +1,8 @@
 <resources>
 	<string name="app_name">Morse Ring</string>
+	<string name="activity_title_1">Morse Ring Settings</string>
 	<string name="tf_hint_1">Test fake call from:</string>
 	<string name="btn_label_1">Fake Call!</string>
-	<string name="btn_label_2">Save Preferences</string>
+	<string name="btn_label_2">Save Settings</string>
 	<string name="tf_hint_2">DIT duration</string>
-	<string name="tf_hint_3">DAH duration</string>
-	<string name="tf_hint_4">DIT-DAH gap</string>
-	<string name="tf_hint_5">LETTER gap</string>
-	<string name="tf_hint_6">WORD gap</string>
 </resources>
